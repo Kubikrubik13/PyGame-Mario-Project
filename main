@@ -1,0 +1,42 @@
+import pygame
+
+
+class Mario(sprite.Sprite):
+    def __init__(self, x, y):
+        sprite.Sprite.__init__(self)
+        self.vl = 0
+        self.begx = x
+        self.begy = y
+        self.image =
+        self.rect = Rect(x, y, 20, 30)
+
+    def update(self, left, right):
+        if left:
+            self.vl = -20
+
+        if right:
+            self.vl = 20
+
+        if not (left or right):
+            self.vl = 0
+
+    
+
+
+def main():
+    pygame.init()
+    size = width, height = 800, 600
+    screen = pygame.display.set_mode(size)
+    screen.fill(pygame.Color('black'))
+    pygame.display.set_caption("Super Mario")
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        pygame.display.update()
+
+
+if __name__ == "__main__":
+    main()
