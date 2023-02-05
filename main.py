@@ -109,7 +109,8 @@ def main():
     size = width, height = 2800, 1752
     screen = pygame.display.set_mode(size)
     screen.fill(pygame.Color('black'))
-    firstwindow_draw()
+    running = True
+#    firstwindow_draw()
     pygame.display.set_caption("Chasing the Всеросс")
 
     while running:
@@ -118,6 +119,7 @@ def main():
                 running = False
 
         pygame.display.update()
+
 
 
 if __name__ == "__main__":

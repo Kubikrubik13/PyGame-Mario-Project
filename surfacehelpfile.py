@@ -1,3 +1,6 @@
+import pygame
+
+
 def firstwindow_draw():
     screen = pygame.display.set_mode(size)
     screen.fill(pygame.image('background.png'))
@@ -32,4 +35,3 @@ def firstwindow_draw():
     head_text_x = 2100 - head_text.get_width() // 2
     head_text_y = 876 + head_text.get_height() // 2
     screen.blit(head_text, (head_text_x, head_text_y))
-
