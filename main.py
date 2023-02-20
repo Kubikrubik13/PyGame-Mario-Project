@@ -1,4 +1,6 @@
 import pygame
+import os
+import sys
 from surfacehelpfile import firstwindow_draw
 
 
@@ -10,6 +12,15 @@ class SpriteGroup(pygame.sprite.Group):
     def get_event(self, event):
         for sprite in self:
             sprite.get_event(event)
+
+    def load_image(name, colorkey=None):
+        fullname = os.path.join('data', name)
+        if not os.path.isfile(fullname):
+            print(f"Файл с изображением '{fullname}' не найден")
+            sys.exit()
+        image = pygame.image.load(fullname)
+        return image
+
 
 class Sprite(pygame.sprite.Sprite):
 
@@ -25,7 +36,8 @@ class Block(pygame.sprite.Sprite):
 
     def __init__(self, block_type, pos_x, pos_y):
         super().__init__(sprite_group)
-        self.image = load_image("block.jpg")
+        self.image = pygame.load_image("block.jpg")
+        (block_width, block_height) = self.image.size()
         self.rect = self.image.get_rect().move(block_width * pos_x, block_height * pos_y)
 
 
@@ -33,13 +45,15 @@ class Student(pygame.sprite.Sprite):
 
     def __init__(self, pos_x, pos_y):
         super().__init__(student_group)
-        self.image = load_image("student.png")
+        self.image = pygame.load_image("student.png")
         self.image = self.image.convert_alpha()
+        (block_width, block_height) = Block.image.size()
         self.rect = self.image.get_rect().move(block_width * pos_x + 15, block_height * pos_y + 5)
         self.pos = (pos_x, pos_y)
 
     def move(self, x, y):
         self.pos = (x, y)
+        (block_width, block_height) = Block.image.size()
         self.rect = self.image.get_rect().move(
             block_width * self.pos[0] + 15, block_height * self.pos[1] + 5)
 
@@ -79,12 +93,13 @@ def generate_level(level):
                 Block('wall', x, y)
             elif level[y][x] == '@':
                 Block('empty', x, y)
-                new_player = Player(x, y)
+                new_player = Student(x, y)
                 level[y][x] = "."
     return new_player, x, y
 
 
 def move(student, movement):
+    level_map = load_level('level_1.txt')
     x, y = student.pos
     print(level_map[x][y - 1])
     print(level_map[x][y + 1])
