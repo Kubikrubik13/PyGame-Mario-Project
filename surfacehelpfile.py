@@ -1,7 +1,9 @@
 import pygame
+from pygame import Surface
 
 
 def firstwindow_draw():
+    size = width, height = 2800, 1752
     screen = pygame.display.set_mode(size)
     screen.fill(pygame.image('background.png'))
 
