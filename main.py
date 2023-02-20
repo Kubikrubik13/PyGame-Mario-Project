@@ -1,7 +1,6 @@
 import pygame
-import os
 import sys
-from surfacehelpfile import firstwindow_draw
+from surfacehelpfile import firstwindow_draw, load_image
 
 
 class SpriteGroup(pygame.sprite.Group):
@@ -12,14 +11,6 @@ class SpriteGroup(pygame.sprite.Group):
     def get_event(self, event):
         for sprite in self:
             sprite.get_event(event)
-
-    def load_image(name, colorkey=None):
-        fullname = os.path.join('data', name)
-        if not os.path.isfile(fullname):
-            print(f"Файл с изображением '{fullname}' не найден")
-            sys.exit()
-        image = pygame.image.load(fullname)
-        return image
 
 
 class Sprite(pygame.sprite.Sprite):
@@ -36,7 +27,7 @@ class Block(pygame.sprite.Sprite):
 
     def __init__(self, block_type, pos_x, pos_y):
         super().__init__(sprite_group)
-        self.image = pygame.load_image("block.jpg")
+        self.image = load_image("block.jpg")
         (block_width, block_height) = self.image.size()
         self.rect = self.image.get_rect().move(block_width * pos_x, block_height * pos_y)
 
@@ -45,11 +36,12 @@ class Student(pygame.sprite.Sprite):
 
     def __init__(self, pos_x, pos_y):
         super().__init__(student_group)
-        self.image = pygame.load_image("student.png")
+        self.image = load_image("student.png")
         self.image = self.image.convert_alpha()
         (block_width, block_height) = Block.image.size()
         self.rect = self.image.get_rect().move(block_width * pos_x + 15, block_height * pos_y + 5)
         self.pos = (pos_x, pos_y)
+        self.vl = 0
 
     def move(self, x, y):
         self.pos = (x, y)
@@ -119,22 +111,21 @@ def move(student, movement):
         if x < max_x - 1 and level_map[y][x + 1] == ".":
             student.move(x + 1, y)
 
+
 def main():
     pygame.init()
-    size = width, height = 2800, 1752
+    size = width, height = 300, 300
     screen = pygame.display.set_mode(size)
     screen.fill(pygame.Color('black'))
     running = True
-#    firstwindow_draw()
+    firstwindow_draw()
     pygame.display.set_caption("Chasing the Всеросс")
 
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
         pygame.display.update()
-
 
 
 if __name__ == "__main__":

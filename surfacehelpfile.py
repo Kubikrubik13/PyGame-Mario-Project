@@ -1,12 +1,21 @@
 import pygame
 from pygame import Surface
+import os
+
+
+def load_image(name, colorkey=None):
+    fullname = os.path.join('images', name)
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    return image
 
 
 def firstwindow_draw():
-    size = width, height = 2800, 1752
+    size = width, height = 200, 200
     screen = pygame.display.set_mode(size)
-    screen.fill(pygame.image('background.png'))
-
+    screen.blit(load_image('background.png'), [0, 0])
 #   Заголовок:
     font = pygame.font.Font(None, 50)
     head_text = font.render("Погоня за всероссом", True, (100, 255, 100))
