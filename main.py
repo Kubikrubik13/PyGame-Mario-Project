@@ -1,10 +1,22 @@
 import pygame
 import sys
+import os
 from surfacehelpfile import firstwindow_draw, load_image
 
 
-class SpriteGroup(pygame.sprite.Group):
+size = width, height = 300, 300
 
+def load_image(name, colorkey=None):
+    fullname = os.path.join('images', name)
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    return image
+
+
+
+class SpriteGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
 
@@ -92,6 +104,7 @@ def generate_level(level):
 
 def move(student, movement):
     level_map = load_level('level_1.txt')
+    generate_level(level_map)
     x, y = student.pos
     print(level_map[x][y - 1])
     print(level_map[x][y + 1])
@@ -102,19 +115,19 @@ def move(student, movement):
         if y > 0 and level_map[y - 1][x] == ".":
             student.move(x, y - 1)
     elif movement == "down":
-        if y < max_y - 1 and level_map[y + 1][x] == ".":
+        if y < height - 1 and level_map[y + 1][x] == ".":
             student.move(x, y + 1)
     elif movement == "left":
         if x > 0 and level_map[y][x - 1] == ".":
             student.move(x - 1, y)
     elif movement == "right":
-        if x < max_x - 1 and level_map[y][x + 1] == ".":
+        if x < width - 1 and level_map[y][x + 1] == ".":
             student.move(x + 1, y)
 
 
 def main():
     pygame.init()
-    size = width, height = 300, 300
+    size = width, height
     screen = pygame.display.set_mode(size)
     screen.fill(pygame.Color('black'))
     running = True
