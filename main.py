@@ -3,8 +3,9 @@ import sys
 import os
 from surfacehelpfile import firstwindow_draw, load_image
 
-
 size = width, height = 300, 300
+block_width, block_height = 20, 20
+
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('images', name)
@@ -13,7 +14,6 @@ def load_image(name, colorkey=None):
         sys.exit()
     image = pygame.image.load(fullname)
     return image
-
 
 
 class SpriteGroup(pygame.sprite.Group):
@@ -36,11 +36,12 @@ class Sprite(pygame.sprite.Sprite):
 
 
 class Block(pygame.sprite.Sprite):
-
     def __init__(self, block_type, pos_x, pos_y):
         super().__init__(sprite_group)
         self.image = load_image("block.jpg")
         (block_width, block_height) = self.image.size()
+        ## Нужно сжимать изображение до такого формата
+        self.block_type = block_type
         self.rect = self.image.get_rect().move(block_width * pos_x, block_height * pos_y)
 
 
@@ -49,17 +50,22 @@ class Student(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(student_group)
         self.image = load_image("student.png")
-        self.image = self.image.convert_alpha()
-        (block_width, block_height) = Block.image.size()
-        self.rect = self.image.get_rect().move(block_width * pos_x + 15, block_height * pos_y + 5)
+        self.image = self.image.convert_alpha()  ## Лучше запихнуть внутрь load_image
+        # (block_width, block_height) = Block.image.size()  ## Нельзя так писать!
+        self.x, self.y = block_width * pos_x + 15, block_height * pos_y + 5
+        self.rect = self.image.get_rect().move(self.x, self.y)
         self.pos = (pos_x, pos_y)
         self.vl = 0
 
-    def move(self, x, y):
-        self.pos = (x, y)
-        (block_width, block_height) = Block.image.size()
+    def move(self, vl_x, vl_y=0):
+        self.x += vl_x
+        self.y += vl_y
+        self.rect = self.image.get_rect().move(self.x, self.y)
+        ## Весь метод неверный
+        '''self.pos = (x, y)
+        #(block_width, block_height) = Block.image.size() 
         self.rect = self.image.get_rect().move(
-            block_width * self.pos[0] + 15, block_height * self.pos[1] + 5)
+            block_width * self.pos[0] + 15, block_height * self.pos[1] + 5)'''
 
     def update(self, left, right):
         if left and self.vl <= 200:
@@ -70,6 +76,7 @@ class Student(pygame.sprite.Sprite):
 
         if not (left or right):
             self.vl = 0
+        self.move(vl)
 
 
 sprite_group = SpriteGroup()
@@ -80,9 +87,9 @@ clock = pygame.time.Clock()
 
 
 def load_level(filename):
-    filename = "data/" + filename
-    with open(filename, 'r') as mapFile:
-        level_map = [line.strip() for line in mapFile]
+    filename = os.path.join("data", filename)
+    with open(filename, 'r') as map_file:
+        level_map = [line.strip() for line in map_file]
     max_width = max(map(len, level_map))
     return list(map(lambda x: list(x.ljust(max_width, '.')), level_map))
 
