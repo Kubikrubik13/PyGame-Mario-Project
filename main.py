@@ -1,10 +1,9 @@
 import pygame
 import sys
 import os
+from const import WIDTH, HEIGHT, BL_IMAGE_SIZE, ST_IMAGE_SIZE
 from surfacehelpfile import firstwindow_draw, load_image
 
-size = width, height = 300, 300
-block_width, block_height = 20, 20
 
 
 def load_image(name, colorkey=None):
@@ -13,6 +12,7 @@ def load_image(name, colorkey=None):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
     image = pygame.image.load(fullname)
+    image = image.convert_alpha()
     return image
 
 
@@ -38,11 +38,12 @@ class Sprite(pygame.sprite.Sprite):
 class Block(pygame.sprite.Sprite):
     def __init__(self, block_type, pos_x, pos_y):
         super().__init__(sprite_group)
-        self.image = load_image("block.jpg")
-        (block_width, block_height) = self.image.size()
+        self.image_bl = load_image("block.jpg")
+        self.image_bl = pygame.transform.scale(self.image_bl, BL_IMAGE_SIZE)
+        ## (block_width, block_height) = self.image.size()
         ## Нужно сжимать изображение до такого формата
         self.block_type = block_type
-        self.rect = self.image.get_rect().move(block_width * pos_x, block_height * pos_y)
+        self.rect = self.image.get_rect().move(BL_IMAGE_SIZE[0] * pos_x, BL_IMAGE_SIZE[1] * pos_y)
 
 
 class Student(pygame.sprite.Sprite):
@@ -50,9 +51,8 @@ class Student(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(student_group)
         self.image = load_image("student.png")
-        self.image = self.image.convert_alpha()  ## Лучше запихнуть внутрь load_image
-        # (block_width, block_height) = Block.image.size()  ## Нельзя так писать!
-        self.x, self.y = block_width * pos_x + 15, block_height * pos_y + 5
+        self.image_st = pygame.transform.scale(self.image_st, ST_IMAGE_SIZE)
+        self.x, self.y = BL_IMAGE_SIZE[0] * pos_x + 15, BL_IMAGE_SIZE[1] * pos_y + 5
         self.rect = self.image.get_rect().move(self.x, self.y)
         self.pos = (pos_x, pos_y)
         self.vl = 0
@@ -67,16 +67,22 @@ class Student(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(
             block_width * self.pos[0] + 15, block_height * self.pos[1] + 5)'''
 
-    def update(self, left, right):
+    def update(self, left, right, up, down):
         if left and self.vl <= 200:
             self.vl = -20
 
         if right and self.vl >= -200:
             self.vl = 20
 
+        if up and self.vl >= -200:
+            self.vl = 20
+
+        if down and self.vl >= -200:
+            self.vl = 20
+
         if not (left or right):
             self.vl = 0
-        self.move(vl)
+        self.move(self.vl)
 
 
 sprite_group = SpriteGroup()
@@ -134,11 +140,15 @@ def move(student, movement):
 
 def main():
     pygame.init()
-    size = width, height
+    size = WIDTH, HEIGHT
     screen = pygame.display.set_mode(size)
     screen.fill(pygame.Color('black'))
     running = True
-    firstwindow_draw()
+    lvl = firstwindow_draw()
+    if lvl == 1:
+        generate_level(load_level('level_1.txt'))
+    elif lvl == 2:
+        generate_level(load_level('level_2.txt'))
     pygame.display.set_caption("Chasing the Всеросс")
 
     while running:
