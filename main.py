@@ -5,7 +5,6 @@ from const import WIDTH, HEIGHT, BL_IMAGE_SIZE, ST_IMAGE_SIZE
 from surfacehelpfile import firstwindow_draw, load_image
 
 
-
 def load_image(name, colorkey=None):
     fullname = os.path.join('images', name)
     if not os.path.isfile(fullname):
@@ -25,6 +24,13 @@ class SpriteGroup(pygame.sprite.Group):
             sprite.get_event(event)
 
 
+sprite_group = SpriteGroup()
+student_group = SpriteGroup()
+student = None
+learning = True
+clock = pygame.time.Clock()
+
+
 class Sprite(pygame.sprite.Sprite):
 
     def __init__(self, group):
@@ -38,20 +44,26 @@ class Sprite(pygame.sprite.Sprite):
 class Block(pygame.sprite.Sprite):
     def __init__(self, block_type, pos_x, pos_y):
         super().__init__(sprite_group)
-        self.image_bl = load_image("block.jpg")
-        self.image_bl = pygame.transform.scale(self.image_bl, BL_IMAGE_SIZE)
+        self.image = load_image("block.jpg")
+        self.image = pygame.transform.scale(self.image, BL_IMAGE_SIZE)
         ## (block_width, block_height) = self.image.size()
         ## Нужно сжимать изображение до такого формата
         self.block_type = block_type
         self.rect = self.image.get_rect().move(BL_IMAGE_SIZE[0] * pos_x, BL_IMAGE_SIZE[1] * pos_y)
 
+    def __str__(self):
+        return f'Block {self.block_type} at {self.rect}'
+
+    def __repr__(self):
+        return f'Block {self.block_type} at {self.rect}'
+
 
 class Student(pygame.sprite.Sprite):
 
-    def __init__(self, pos_x, pos_y):
+    def __init__(self, pos_x: int, pos_y: int):
         super().__init__(student_group)
         self.image = load_image("student.png")
-        self.image_st = pygame.transform.scale(self.image_st, ST_IMAGE_SIZE)
+        self.image = pygame.transform.scale(self.image, ST_IMAGE_SIZE)
         self.x, self.y = BL_IMAGE_SIZE[0] * pos_x + 15, BL_IMAGE_SIZE[1] * pos_y + 5
         self.rect = self.image.get_rect().move(self.x, self.y)
         self.pos = (pos_x, pos_y)
@@ -78,12 +90,11 @@ class Student(pygame.sprite.Sprite):
             self.vl += 0
         self.move(self.vl)
 
+    def __str__(self):
+        return f'Student at {self.x, self.y}'
 
-sprite_group = SpriteGroup()
-student_group = SpriteGroup()
-student = None
-learning = True
-clock = pygame.time.Clock()
+    def __repr__(self):
+        return f'Student at {self.x, self.y}'
 
 
 def load_level(filename):
@@ -93,19 +104,29 @@ def load_level(filename):
     max_width = max(map(len, level_map))
     return list(map(lambda x: list(x.ljust(max_width, '.')), level_map))
 
+
 ## создать матрицу (прочитать txt)
 def generate_level(level):
-    new_player, x, y = None, None, None
+    new_player = None
+    game_field = []
     for i in range(len(level)):
-        level[i] = level[i].split()
-        for elem in level[i]:
-            elem = str(elem)
+        line = []
+        for j, elem in enumerate(level[i]):
             if elem == '.':
-                elem.replace(elem, None)
+                line.append(None)
             elif elem == '#':
-                elem.replace(elem, 'Block')
+                line.append(Block('Block', j, i))
+            elif elem == '@':
+                line.append(None)
+                new_player = Student(j, i)
+        game_field.append(line[:])
 
-    return level, str(Student(x, y))
+    return game_field, new_player
+
+
+def fill_sprite_group(sprite_group, array, filtering):
+    pass
+
 
 def main():
     pygame.init()
@@ -113,24 +134,34 @@ def main():
     screen = pygame.display.set_mode(size)
     screen.fill(pygame.Color('black'))
     running = True
-    lvl = firstwindow_draw()
-    if lvl == 1:
-        generate_level(load_level('level_1.txt'))
-    elif lvl == 2:
-        generate_level(load_level('level_2.txt'))
+    firstwindow_draw()
+    lvl_number = 1
+    lvl = None
+    if lvl_number == 1:
+        lvl = generate_level(load_level('level_1.txt'))
+    elif lvl_number == 2:
+        lvl = generate_level(load_level('level_2.txt'))
+    print(sprite_group)
+    for i in sprite_group:
+        print(i)
     pygame.display.set_caption("Chasing the Всеросс")
-
+    game_condition = 'starting_screen'
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.MOUSEBUTTONUP:
-                if event.pos[0] <= WIDTH / 2:
-                    screen.fill((255, 255, 255))
-                    lvl = 1
-                elif event.pos[0] >= WIDTH / 2:
-                    screen.fill((255, 255, 255))
-                    lvl = 2
+            elif game_condition == 'starting_screen':
+                if event.type == pygame.MOUSEBUTTONUP:
+                    game_condition = 'started_level'
+                    if event.pos[0] <= WIDTH / 2:
+                        screen.fill((255, 255, 255))
+                        lvl = 1
+                    elif event.pos[0] >= WIDTH / 2:
+                        screen.fill((255, 255, 255))
+                        lvl = 2
+            elif game_condition == 'started_level':
+                sprite_group.draw(screen)
+                student_group.draw(screen)
         pygame.display.update()
 
 
