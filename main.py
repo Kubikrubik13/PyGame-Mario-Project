@@ -69,19 +69,13 @@ class Student(pygame.sprite.Sprite):
 
     def update(self, left, right, up, down):
         if left and self.vl <= 200:
-            self.vl = -20
+            self.vl -= 20
 
         if right and self.vl >= -200:
-            self.vl = 20
-
-        if up and self.vl >= -200:
-            self.vl = 20
-
-        if down and self.vl >= -200:
-            self.vl = 20
+            self.vl += 20
 
         if not (left or right):
-            self.vl = 0
+            self.vl += 0
         self.move(self.vl)
 
 
@@ -99,44 +93,19 @@ def load_level(filename):
     max_width = max(map(len, level_map))
     return list(map(lambda x: list(x.ljust(max_width, '.')), level_map))
 
-
+## создать матрицу (прочитать txt)
 def generate_level(level):
     new_player, x, y = None, None, None
-    for y in range(len(level)):
-        for x in range(len(level[y])):
-            if level[y][x] == '.':
-                Block('empty', x, y)
-            elif level[y][x] == '#':
-                Block('wall', x, y)
-            elif level[y][x] == '@':
-                Block('empty', x, y)
-                new_player = Student(x, y)
-                level[y][x] = "."
-    return new_player, x, y
+    for i in range(len(level)):
+        level[i] = level[i].split()
+        for elem in level[i]:
+            elem = str(elem)
+            if elem == '.':
+                elem.replace(elem, None)
+            elif elem == '#':
+                elem.replace(elem, 'Block')
 
-
-def move(student, movement):
-    level_map = load_level('level_1.txt')
-    generate_level(level_map)
-    x, y = student.pos
-    print(level_map[x][y - 1])
-    print(level_map[x][y + 1])
-    print(level_map[x - 1][y])
-    print(level_map[x][y + 1])
-    print()
-    if movement == "up":
-        if y > 0 and level_map[y - 1][x] == ".":
-            student.move(x, y - 1)
-    elif movement == "down":
-        if y < height - 1 and level_map[y + 1][x] == ".":
-            student.move(x, y + 1)
-    elif movement == "left":
-        if x > 0 and level_map[y][x - 1] == ".":
-            student.move(x - 1, y)
-    elif movement == "right":
-        if x < width - 1 and level_map[y][x + 1] == ".":
-            student.move(x + 1, y)
-
+    return level, str(Student(x, y))
 
 def main():
     pygame.init()
@@ -155,6 +124,13 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.pos[0] <= WIDTH / 2:
+                    screen.fill((255, 255, 255))
+                    lvl = 1
+                elif event.pos[0] >= WIDTH / 2:
+                    screen.fill((255, 255, 255))
+                    lvl = 2
         pygame.display.update()
 
 

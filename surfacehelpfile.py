@@ -16,7 +16,7 @@ def load_image(name, colorkey=None):
 
 def firstwindow_draw():
     ## Никаких абсолютных координат, только от WIDTH, HEIGHT
-    lvl = 0
+
     pygame.init()
     running = True
     size = WIDTH, HEIGHT
@@ -57,19 +57,6 @@ def firstwindow_draw():
     head_text_x = 2100 - head_text.get_width() // 2
     head_text_y = 876 + head_text.get_height() // 2
     screen.blit(head_text, (head_text_x, head_text_y))
-
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONUP:
-                if pygame.MOUSEBUTTONUP[0][0] <= WIDTH / 2:
-                    screen.fill(255, 255, 255)
-                    lvl = 1
-                if pygame.MOUSEBUTTONUP[0][0] >= WIDTH / 2:
-                    screen.fill(255, 255, 255)
-                    lvl = 2
-                elif event.type == pygame.QUIT:
-                    running = False
-            pygame.display.update()
 
     return lvl
 
