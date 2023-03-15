@@ -58,6 +58,6 @@ def firstwindow_draw():
     head_text_y = 876 + head_text.get_height() // 2
     screen.blit(head_text, (head_text_x, head_text_y))
 
-    return lvl
 
-firstwindow_draw()
+if __name__ == '__main__':
+    firstwindow_draw()
