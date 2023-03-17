@@ -90,6 +90,9 @@ class Student(pygame.sprite.Sprite):
             self.vl += 0
         self.move(self.vl)
 
+        if pygame.sprite.spritecollideany(self, Block):
+            self.vl = 0
+
     def __str__(self):
         return f'Student at {self.x, self.y}'
 
@@ -98,7 +101,7 @@ class Student(pygame.sprite.Sprite):
 
 
 def load_level(filename):
-    filename = os.path.join("data", filename)
+    filename = os.path.join("levels", filename)
     with open(filename, 'r') as map_file:
         level_map = [line.strip() for line in map_file]
     max_width = max(map(len, level_map))
@@ -135,7 +138,7 @@ def main():
     screen.fill(pygame.Color('black'))
     running = True
     firstwindow_draw()
-    lvl_number = 1
+    lvl_number = 2
     lvl = None
     if lvl_number == 1:
         lvl = generate_level(load_level('level_1.txt'))
